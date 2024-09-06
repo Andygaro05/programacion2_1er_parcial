@@ -23,7 +23,6 @@
 
 ##Para el gerente
 
-* El sistema debe permitir calcular el porcentaje de ausentismo y evaluar la eficiencia de consultas
 * El sistema debe generar reportes de:
 - Medico con mas demanda
 - Motivos de cancelación (Grafica podria ser una opción valida)
