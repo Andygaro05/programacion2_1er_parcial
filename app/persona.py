@@ -1,3 +1,4 @@
+from cita import *
 class Persona:
     def __init__(self, nombre, cc, celular, correo, fecha_nacimiento, medico_asignado):
         self.nombre = nombre
@@ -6,6 +7,13 @@ class Persona:
         self.correo = correo
         self.fecha_nacimiento = fecha_nacimiento
         self.medico_asignado = medico_asignado
+
+    def reservar_cita(self, medico, dia, hora):
+        if medico.esta_disponible(dia, hora):
+            cita = Cita(self, medico, dia, hora)
+            return cita
+        else:
+            return None
 
     def __str__(self):
         """Retorna una Representación de cada paciente"""

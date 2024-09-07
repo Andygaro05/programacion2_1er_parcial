@@ -1,6 +1,7 @@
 from hospital import *
 from persona import *
 from medico import *
+from cita import *
 from datetime import datetime
 
 # Crear un hospital
@@ -28,3 +29,17 @@ print(cardiologos)
 
 # Mostrar información de las personas
 print(personas)
+
+cita1 = Cita(persona1, medico1, datetime(2023, 11, 22, 10, 0))
+
+# Agregando la cita al médico y a citas
+medico1.agregar_cita(cita1)
+citas = Citas()
+citas.agregar_cita(cita1)  
+
+# Confirmando la cita
+cita1.confirmar()
+
+# Buscando citas de un médico
+citas_del_medico1 = medico1.citas
+print(citas_del_medico1)
