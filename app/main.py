@@ -1,28 +1,30 @@
-from hospital import Hospital
+from hospital import *
 from persona import *
+from medico import *
 from datetime import datetime
 
+# Crear un hospital
 hospital = Hospital("Hospital XYZ", "Carrera 100# random")
-hospital.__repr__()
 
-# hospital = Hospital("XYZ", "prueba") #crashea demostrando asi que el singleton funciona 
+# Crear médicos
+medico1 = Medico("Dr. García", "Cardiología")
+medico2 = Medico("Dra. López", "Pediatría")
 
-# Creando algunas instancias de Persona
-persona1 = Persona("Juan Pérez", 12345678, "1234567890", "juan@example.com", datetime.now(), None)
-persona2 = Persona("Ana López", 87654321, "9876543210", "ana@example.com", datetime.now(), None)
+# Agregar las instancias a medicos
+medicos = Medicos()
+medicos.agregar_medico(medico1)
+medicos.agregar_medico(medico2)
 
-# Creando una instancia de Personas
+# Crear personas
+persona1 = Persona("Juan Pérez", 12345678, "1234567890", "juan@example.com", datetime.now().strftime('%Y-%m-%d'), medico1)
+persona2 = Persona("Ana López", 87654321, "9876543210", "ana@example.com", datetime.now().strftime('%Y-%m-%d'), medico2)
+
 personas = Personas()
+personas.agregar_personas([persona1, persona2])
 
-# Agregando personas a la lista
-personas.agregar_persona(persona1)
-personas.agregar_persona(persona2)
+# Buscar médicos por especialidad
+cardiologos = medicos.buscar_medico_especialidad("Cardiología")
+print(cardiologos)
 
-# Creando una lista de personas y agregándolas
-nueva_lista_personas = [
-    Persona("Pedro Gómez", 54321, "123456789", "pedro@example.com", datetime.now(), None),
-    Persona("Maria Sánchez", 98765, "987654321", "maria@example.com", datetime.now(), None)
-]
-personas.agregar_personas(nueva_lista_personas)
-
+# Mostrar información de las personas
 print(personas)

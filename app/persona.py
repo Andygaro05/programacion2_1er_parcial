@@ -8,7 +8,8 @@ class Persona:
         self.medico_asignado = medico_asignado
 
     def __str__(self):
-        return f"Paciente {self.nombre} - {self.cc}"
+        """Retorna una Representación de cada paciente"""
+        return f"Paciente {self.nombre} - {self.cc} Nacido en: {self.fecha_nacimiento}"
 
 class Personas:
     def __init__(self):
