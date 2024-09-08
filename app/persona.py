@@ -52,6 +52,7 @@ class Persona:
                 if motivo_seleccionado == 0:
                     return None
                 elif 1 <= motivo_seleccionado <= len(motivos_cancelacion):
+                    request.cancelar()
                     citas.cancelar_cita(request)
                     print(f"Cita cancelada. Motivo: {motivos_cancelacion[motivo_seleccionado - 1]}")
                 

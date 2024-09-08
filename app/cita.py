@@ -26,6 +26,7 @@ class Citas:
         for i, c in enumerate(self.citas):
             if c == cita:
                 self.citas.pop(i)
+                cita.estado = "cancelada"
                 return True
         return False
     

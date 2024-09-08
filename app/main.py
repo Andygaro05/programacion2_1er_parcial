@@ -3,6 +3,7 @@ from persona import *
 from medico import *
 from cita import *
 from handler import *
+from reporte import *
 from datetime import datetime
 
 # Crear un hospital
@@ -32,6 +33,9 @@ persona2 = Persona("Ana López", 87654321, "9876543210", "ana@example.com", date
 # Crear citas
 citas = Citas()
 
+#Crear objeto reporte
+reporte = Reporte(citas) 
+
 
 def menu_principal():
     while True:
@@ -41,7 +45,10 @@ def menu_principal():
         print("3. Reservar cita")
         print("4. Cancelar cita")
         print("5. Ver mis citas")
-        print("6. Salir")
+        print("6. Ver reporte de citas (Medico mas agendado)")
+        print("7. Ver reporte de citas (Motivo de cancelación mas común)")
+        print("8. Exportar a excel")
+        print("9. Salir")
         opcion = input("Ingrese una opción: ")
 
         if opcion == '1':
@@ -71,7 +78,7 @@ def menu_principal():
             medico_asignado = medicos_utiles[0]
 
             mes = int(input("Ingresa el mes que te gustaria la cita ejemplo (10): "))
-            dia = int(input("Ingresa el dia que te gustaria la cita: ejemplo (12)"))
+            dia = int(input("Ingresa el dia que te gustaria la cita: ejemplo (12): "))
             persona3 = Persona(nombre, cc, celular, correo, datetime.now().strftime('%Y-%m-%d'), medico_asignado=medico_asignado)
             
             request = Cita(
@@ -87,12 +94,28 @@ def menu_principal():
         elif opcion == '4':
             # Cancelar cita
             persona3.cancelar_cita(request, citas)
+            print(request.estado)
             pass
         elif opcion == '5':
             # Ver mis citas
             persona3.ver_citas(citas)
             pass
         elif opcion == '6':
+            #ver reportes
+            # Crear un objeto Reporte
+            medico_mas_agendado, cantidad_citas = reporte.medico_mas_agendado()
+            print(f"El médico más agendado es {medico_mas_agendado.nombre} con {cantidad_citas} citas.")
+
+        elif opcion == '7':
+            # Crear un objeto Reporte
+            motivo_mas_comun, cantidad_cancelaciones = reporte.motivo_cancelacion_mas_comun()
+            print(f"El motivo de cancelación más común es '{motivo_mas_comun}' con {cantidad_cancelaciones} cancelaciones.")
+        
+        elif opcion == '8':
+            # Crear un objeto Reporte
+            reporte.exportar_a_excel()
+
+        elif opcion == '9':
             print("¡Hasta luego!")
             break
         else:
