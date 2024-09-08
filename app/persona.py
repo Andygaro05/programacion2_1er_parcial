@@ -1,4 +1,7 @@
 from cita import *
+from medico import *
+from datetime import datetime, timedelta
+
 class Persona:
     def __init__(self, nombre, cc, celular, correo, fecha_nacimiento, medico_asignado):
         self.nombre = nombre
@@ -9,34 +12,54 @@ class Persona:
         self.medico_asignado = medico_asignado
 
     def reservar_cita(self, medico, dia, hora):
-        if medico.esta_disponible(dia, hora):
-            cita = Cita(self, medico, dia, hora)
+        """Reserva una cita con el médico especificado en el día y hora dados.    
+        
+    Args:
+        medico (Medico): El objeto Médico.
+        dia (int): El día de la semana (1-7).
+        hora (int): La hora (0-23).
+    
+    Returns:
+        Cita: El objeto Cita creado, o None si no hay disponibilidad.
+        """
+
+        # Crear un objeto datetime a partir de dia y hora
+        fecha_hora = datetime(2023, 1, 1) + timedelta(days=dia-1, hours=hora)
+
+        if medico.esta_disponible(fecha_hora):
+            cita = Cita(self, medico, fecha_hora)
             return cita
         else:
             return None
         
-    def cancelar_cita(self, cita, motivos_cancelacion):
+    def cancelar_cita(self, cita):
         """
-        Cancela una cita y permite al usuario seleccionar un motivo.
+    Cancela una cita y permite al usuario seleccionar un motivo de cancelación.
 
-        Args:
-            cita (Cita): La cita a cancelar.
-            motivos_cancelacion (list): Lista de motivos de cancelación posibles.
+    Args:
+        cita (Cita): La cita a cancelar.
         """
+
+        motivos_cancelacion = ["Doble reserva", "Cambio de horario", "Enfermedad", "Otro"]
 
         print("Motivos de cancelación:")
-        for i, motivo in enumerate(motivos_cancelacion):
-            print(f"{i+1}. {motivo}")
+        for i, motivo in enumerate(motivos_cancelacion, start=1):
+            print(f"{i}. {motivo}")
 
-        motivo_seleccionado = int(input("Seleccione el motivo de cancelación: ")) - 1
-
-        # Validar que el motivo seleccionado sea válido
-        if 0 <= motivo_seleccionado < len(motivos_cancelacion):
-            cita.cancelar()
-            print(f"Cita cancelada. Motivo: {motivos_cancelacion[motivo_seleccionado]}")
-            # Aquí puedes agregar lógica para notificar al médico, etc.
-        else:
-            print("Motivo de cancelación inválido.")
+        while True:
+            try:
+                motivo_seleccionado = int(input("Seleccione el motivo de cancelación (0 para cancelar): "))
+                if motivo_seleccionado == 0:
+                    return None
+                elif 1 <= motivo_seleccionado <= len(motivos_cancelacion):
+                    cita.cancelar()
+                    print(f"Cita cancelada. Motivo: {motivos_cancelacion[motivo_seleccionado - 1]}")
+                
+                    return motivos_cancelacion[motivo_seleccionado - 1]
+                else:
+                    print("Motivo de cancelación inválido.")
+            except ValueError:
+                print("Por favor, ingrese un número válido.")
 
     def __str__(self):
         """Retorna una Representación de cada paciente"""

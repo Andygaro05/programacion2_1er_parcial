@@ -28,12 +28,20 @@ class Citas:
                 self.citas.pop(i)
                 return True
         return False
+    
+    def ver_citas(self):
+        if not self.citas:
+            print("No hay citas registradas.")
+        else:
+            for cita in self.citas:
+                print(cita)
 
     def buscar_citas_por_paciente(self, paciente):
-        return [cita for cita in self.citas if cita.paciente == paciente]
+        return print([cita for cita in self.citas if cita.paciente == paciente])
 
     def buscar_citas_por_medico(self, medico):
-        return [cita for cita in self.citas if cita.medico == medico]
+        return print([cita for cita in self.citas if cita.medico == medico])
 
+    #pulir metodo
     def buscar_citas_por_fecha(self, fecha):
         return [cita for cita in self.citas if cita.fecha_hora.date() == fecha]
