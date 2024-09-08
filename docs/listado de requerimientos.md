@@ -21,11 +21,11 @@
 * El sistema debe permitir asignar un medico a un paciente para una cita
 * El sistema debe llevar un registro de información con los datos del medico incluyendo su especialidad
 
-##Para el gerente (pendientes)
+##Para el gerente
 
 * El sistema debe generar reportes de:
 - Medico con mas demanda
-- Motivos de cancelación (Grafica podria ser una opción valida)
+- Motivos de cancelación
 
 * El sistema debe permitir exportar los reportes a excel
 

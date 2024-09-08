@@ -4,24 +4,35 @@ from cita import *
 from notificar import *
 from datetime import datetime
 
-# class Request:
-#     def __init__(self, paciente, medico, fecha_hora):
-#         self.paciente = paciente
-#         self.medico = medico
-#         self.fecha_hora = fecha_hora
-
-#     def __str__(self) -> str:
-#         return f"cita el dia {self.fecha_hora} con el medico {self.medico}"
 class Handler(ABC):
+    """
+    Clase abstracta que define el patrón Chain of Responsibility para manejar solicitudes de citas.
+    Esta clase representa un eslabón en la cadena de procesamiento de solicitudes.
+    """
     def __init__(self, random, successor=None):
+        """
+        Inicializa un nuevo objeto Handler.
+
+        Args:
+            successor (Handler, opcional): El siguiente handler en la cadena.
+        """
         self._successor = successor
 
     def handle(self, request): 
+        """
+        Maneja una solicitud. Si hay un siguiente handler en la cadena, delega el procesamiento a él.
 
+        Args:
+            request (Request): La solicitud a procesar.
+        """
         if self._successor:
             self._successor.handle(request)
 
 class ValidateAvailabilityHandler(Handler):
+    """
+    Valida la disponibilidad del médico para la cita solicitada.
+    Si el médico está disponible, delega la solicitud al siguiente handler.
+    """
     def handle(self, request):
         # Validar disponibilidad del médico
         if request.medico.esta_disponible(request.fecha_hora):
@@ -30,6 +41,24 @@ class ValidateAvailabilityHandler(Handler):
         else:
             print("El médico no está disponible a esa hora.")
 class ShowAvailableScheduleHandler(Handler):
+    """
+    Muestra los horarios disponibles para un médico y permite al usuario seleccionar una hora.
+
+    Args:
+        request (Request): Objeto de solicitud que contiene la información de la cita.
+        medicos (list): Lista de objetos Medico.
+        citas (list): Lista de objetos Cita.
+
+    Este handler realiza las siguientes acciones:
+    1. Obtiene la especialidad del médico solicitada.
+    2. Busca médicos disponibles con esa especialidad.
+    3. Presenta al usuario los horarios disponibles del médico seleccionado.
+    4. Permite al usuario seleccionar una hora.
+    5. Si el usuario confirma la hora, delega la solicitud al siguiente handler.
+
+    Raises:
+        ValueError: Si la fecha ingresada por el usuario no es válida.
+    """
     def handle(self, request, medicos, citas):
         # Obtener la especialidad del médico de la solicitud
         especialidad = request.medico.especialidad
@@ -90,6 +119,15 @@ class ShowAvailableScheduleHandler(Handler):
 
 
     def _mostrar_horarios_disponibles(self, medico):
+        """
+        Muestra los horarios disponibles para un médico en particular.
+
+        Args:
+            medico (Medico): Objeto que representa al médico.
+
+        Este método es utilizado internamente para presentar los horarios disponibles
+        de un médico en un formato legible para el usuario.
+        """
         print("Horarios disponibles para", medico.nombre)
         for dia, horarios in medico.horario.items():
             for hora, disponible in horarios.items():
@@ -97,6 +135,16 @@ class ShowAvailableScheduleHandler(Handler):
                     print(f"Día {dia}, Hora {hora}")
 
     def _validar_horario(self, medico, horario_seleccionado):
+        """
+        Valida si un horario seleccionado por el usuario es válido para el médico.
+
+        Args:
+            medico (Medico): Objeto que representa al médico.
+            horario_seleccionado (str): Cadena que representa el horario seleccionado (ej: "Lunes 10:00").
+
+        Returns:
+            bool: True si el horario es válido, False en caso contrario.
+        """
         try:
             dia, hora = horario_seleccionado.split(',')
             dia, hora = int(dia.strip()), int(hora.strip())
@@ -105,6 +153,23 @@ class ShowAvailableScheduleHandler(Handler):
             return False
 
 class NotifyPatientHandler(Handler):
+    """
+    Notifica al paciente sobre una cita médica programada.
+
+    Args:
+        request (Request): Objeto de solicitud que contiene la información de la cita.
+
+    Este handler envía una notificación al paciente recordándole su próxima cita.
+    La notificación se envía a través de la clase `Notificar`.
+
+    **Pasos:**
+    1. Crea una instancia de la clase `Notificar`.
+    2. Construye un mensaje de notificación estándar.
+    3. Envía la notificación al paciente utilizando el método `enviar_notificacion` de la clase `Notificar`.
+    4. Imprime un mensaje en la consola para confirmar el envío de la notificación.
+
+    **Nota:** El contenido del mensaje de notificación y el método de envío pueden ser personalizados en la clase `Notificar`.
+    """
     def handle(self, request):
         # Notificar al paciente
         notificar = Notificar()
