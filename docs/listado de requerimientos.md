@@ -21,7 +21,7 @@
 * El sistema debe permitir asignar un medico a un paciente para una cita
 * El sistema debe llevar un registro de información con los datos del medico incluyendo su especialidad
 
-##Para el gerente
+##Para el gerente (pendientes)
 
 * El sistema debe generar reportes de:
 - Medico con mas demanda

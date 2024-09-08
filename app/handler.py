@@ -4,14 +4,14 @@ from cita import *
 from notificar import *
 from datetime import datetime
 
-class Request:
-    def __init__(self, paciente, medico, fecha_hora):
-        self.paciente = paciente
-        self.medico = medico
-        self.fecha_hora = fecha_hora
+# class Request:
+#     def __init__(self, paciente, medico, fecha_hora):
+#         self.paciente = paciente
+#         self.medico = medico
+#         self.fecha_hora = fecha_hora
 
-    def __str__(self) -> str:
-        return f"cita el dia {self.fecha_hora} con el medico {self.medico}"
+#     def __str__(self) -> str:
+#         return f"cita el dia {self.fecha_hora} con el medico {self.medico}"
 class Handler(ABC):
     def __init__(self, random, successor=None):
         self._successor = successor
@@ -25,13 +25,12 @@ class ValidateAvailabilityHandler(Handler):
     def handle(self, request):
         # Validar disponibilidad del médico
         if request.medico.esta_disponible(request.fecha_hora):
-            print("Esta entrando en el if")
             # Si está disponible, continuar con el siguiente handler
             super().handle(request)
         else:
             print("El médico no está disponible a esa hora.")
 class ShowAvailableScheduleHandler(Handler):
-    def handle(self, request, medicos):
+    def handle(self, request, medicos, citas):
         # Obtener la especialidad del médico de la solicitud
         especialidad = request.medico.especialidad
 
@@ -72,6 +71,9 @@ class ShowAvailableScheduleHandler(Handler):
                                 if confirmar.lower() == 's':
                                     fecha_hora = datetime.combine(fecha_deseada, hora_deseada)
                                     request.fecha_hora = fecha_hora
+                                    medico_seleccionado.agregar_cita(request)
+                                    request.confirmar()
+                                    citas.agregar_cita(request)
                                     super().handle(request)
                                 else:
                                     print("Cita cancelada.")

@@ -32,7 +32,7 @@ class Persona:
         else:
             return None
         
-    def cancelar_cita(self, cita):
+    def cancelar_cita(self,request, citas):
         """
     Cancela una cita y permite al usuario seleccionar un motivo de cancelación.
 
@@ -40,7 +40,7 @@ class Persona:
         cita (Cita): La cita a cancelar.
         """
 
-        motivos_cancelacion = ["Doble reserva", "Cambio de horario", "Enfermedad", "Otro"]
+        motivos_cancelacion = ["Doble reserva", "Cambio de horario", "Otro"]
 
         print("Motivos de cancelación:")
         for i, motivo in enumerate(motivos_cancelacion, start=1):
@@ -52,7 +52,7 @@ class Persona:
                 if motivo_seleccionado == 0:
                     return None
                 elif 1 <= motivo_seleccionado <= len(motivos_cancelacion):
-                    cita.cancelar()
+                    citas.cancelar_cita(request)
                     print(f"Cita cancelada. Motivo: {motivos_cancelacion[motivo_seleccionado - 1]}")
                 
                     return motivos_cancelacion[motivo_seleccionado - 1]
@@ -61,6 +61,19 @@ class Persona:
             except ValueError:
                 print("Por favor, ingrese un número válido.")
 
+    def ver_citas(self, citas):
+        """Muestra todas las citas del paciente.
+
+        Busca en la lista global de citas las que pertenecen a este paciente.
+        """
+
+        if not citas.citas:  # Assuming citas is a global variable
+            print("No hay citas registradas.")
+        else:
+            print(f"Citas de {self.nombre}:")
+            for cita in citas.citas:
+                if cita.paciente == self:
+                    print(cita)
     def __str__(self):
         """Retorna una Representación de cada paciente"""
         return f"Paciente {self.nombre} - {self.cc} Nacido en: {self.fecha_nacimiento}"
