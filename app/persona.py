@@ -14,6 +14,29 @@ class Persona:
             return cita
         else:
             return None
+        
+    def cancelar_cita(self, cita, motivos_cancelacion):
+        """
+        Cancela una cita y permite al usuario seleccionar un motivo.
+
+        Args:
+            cita (Cita): La cita a cancelar.
+            motivos_cancelacion (list): Lista de motivos de cancelación posibles.
+        """
+
+        print("Motivos de cancelación:")
+        for i, motivo in enumerate(motivos_cancelacion):
+            print(f"{i+1}. {motivo}")
+
+        motivo_seleccionado = int(input("Seleccione el motivo de cancelación: ")) - 1
+
+        # Validar que el motivo seleccionado sea válido
+        if 0 <= motivo_seleccionado < len(motivos_cancelacion):
+            cita.cancelar()
+            print(f"Cita cancelada. Motivo: {motivos_cancelacion[motivo_seleccionado]}")
+            # Aquí puedes agregar lógica para notificar al médico, etc.
+        else:
+            print("Motivo de cancelación inválido.")
 
     def __str__(self):
         """Retorna una Representación de cada paciente"""

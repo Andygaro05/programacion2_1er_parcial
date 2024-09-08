@@ -1,9 +1,10 @@
+from medico import *
 class Cita:
     def __init__(self, paciente, medico, fecha_hora):
         self.paciente = paciente
         self.medico = medico
         self.fecha_hora = fecha_hora
-        self.estado = "pendiente"  # Puede ser 'pendiente', 'confirmada', 'cancelada'
+        self.estado = "pendiente"
 
     def confirmar(self):
         self.estado = "confirmada"
@@ -13,13 +14,20 @@ class Cita:
 
     def __repr__(self):
         return f"Cita con {self.medico.nombre} el {self.fecha_hora}"
-    
+
 class Citas:
     def __init__(self):
         self.citas = []
 
     def agregar_cita(self, cita):
         self.citas.append(cita)
+
+    def cancelar_cita(self, cita):
+        for i, c in enumerate(self.citas):
+            if c == cita:
+                self.citas.pop(i)
+                return True
+        return False
 
     def buscar_citas_por_paciente(self, paciente):
         return [cita for cita in self.citas if cita.paciente == paciente]
