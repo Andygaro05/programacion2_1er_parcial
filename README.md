@@ -52,6 +52,8 @@ Este proyecto Python implementa un sistema simple para gestionar citas médicas 
 ## Instalación
 ```bash
 pip install -r requirements.txt
+```
+
 Usa el código con precaución.
 
 Uso

@@ -51,42 +51,22 @@ citas.ver_citas()
 
 ##Pruebas personas
 print(medico3.esta_disponible(datetime(2024, 11, 22, 10)))
+
 persona3 = Persona("Ricardo molina", 87654332, "9876543222", "ricardo@example.com", datetime.now().strftime('%Y-%m-%d'), medico3)
 persona3.reservar_cita(medico3,3,5)
 cita2 = Cita(persona3, medico3, datetime(2024, 11, 22, 10))
 citas.agregar_cita(cita2)
 citas.ver_citas()
 
-persona3.cancelar_cita(cita2)
+# persona3.cancelar_cita(cita2)
+#prueba chain of responsability:07:00
+request = Request(
+    paciente=persona3,
+    medico=medico3,
+    fecha_hora=datetime(2024, 12, 23),
+)
 
-
-
-# citas.buscar_citas_por_paciente(persona1)
-# citas.buscar_citas_por_medico(medico1)
-
-
-# personas = Personas()
-# personas.agregar_personas([persona1, persona2])
-
-# # Buscar médicos por especialidad
-# cardiologos = medicos.buscar_medico_especialidad("Cardiología")
-# print(cardiologos)
-
-# # Mostrar información de las personas
-# print(personas)
-
-# cita1 = Cita(persona1, medico1, datetime(2024, 11, 22, 10))
-
-# # Agregando la cita al médico y a citas
-# medico1.agregar_cita(cita1)
-# citas = Citas()
-# citas.agregar_cita(cita1)  
-
-# # Confirmando la cita
-# cita1.confirmar()
-
-# # Buscando citas de un médico
-# citas_del_medico1 = medico1.citas
-# print(citas_del_medico1)
-
-
+# Crear la cadena de responsabilidad
+validate_handler = ValidateAvailabilityHandler(request)
+show_schedule_handler = ShowAvailableScheduleHandler(validate_handler).handle(request, medicos)
+notificar = NotifyPatientHandler(request).handle(request)

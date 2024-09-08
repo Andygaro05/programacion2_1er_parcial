@@ -2,7 +2,16 @@ from abc import ABC, abstractmethod
 from medico import *
 from cita import *
 from notificar import *
+from datetime import datetime
 
+class Request:
+    def __init__(self, paciente, medico, fecha_hora):
+        self.paciente = paciente
+        self.medico = medico
+        self.fecha_hora = fecha_hora
+
+    def __str__(self) -> str:
+        return f"cita el dia {self.fecha_hora} con el medico {self.medico}"
 class Handler(ABC):
     def __init__(self, random, successor=None):
         self._successor = successor
@@ -16,79 +25,67 @@ class ValidateAvailabilityHandler(Handler):
     def handle(self, request):
         # Validar disponibilidad del médico
         if request.medico.esta_disponible(request.fecha_hora):
+            print("Esta entrando en el if")
             # Si está disponible, continuar con el siguiente handler
             super().handle(request)
         else:
             print("El médico no está disponible a esa hora.")
 class ShowAvailableScheduleHandler(Handler):
-    def handle(self, request):
+    def handle(self, request, medicos):
         # Obtener la especialidad del médico de la solicitud
         especialidad = request.medico.especialidad
 
         # Buscar médicos con la especialidad indicada
-        medicos_con_especialidad = Medicos.buscar_medico_especialidad(especialidad)
+        medicos_con_especialidad = Medicos.buscar_medico_especialidad(medicos, especialidad)
 
         if medicos_con_especialidad:
             # Seleccionar el primer médico encontrado
             medico_seleccionado = medicos_con_especialidad[0]
 
-            # Mostrar los horarios disponibles del médico seleccionado
-            print("Horarios disponibles para: ", medico_seleccionado.nombre)
+            # Pedir al usuario que ingrese la fecha deseada
+            fecha_deseada = request.fecha_hora
+            # input("Ingrese la fecha deseada (formato: YYYY-MM-DD): ")
+            try:
+                pass
+            except ValueError:
+                print("Fecha inválida. Por favor, ingrese una fecha en formato YYYY-MM-DD.")
+                return
+
+            # Mostrar los horarios disponibles del médico seleccionado para la fecha deseada
+            print("Horarios disponibles para: ", medico_seleccionado.nombre, " el ", datetime.strftime(fecha_deseada, '%y-%m-%d'))
             for dia, horarios in medico_seleccionado.horario.items():
-                for hora, disponible in horarios.items():
-                    if disponible:
-                        print(f"Día {dia}, Hora {hora}")
+                if dia == fecha_deseada.weekday() + 1:  # Ajustar el índice del día (0-6 -> 1-7)
+                    for hora, disponible in horarios.items():
+                        if disponible:
+                            print(f"Hora {hora}")
 
-            # Si el usuario confirma la hora, continuar con la siguiente acción
-            confirmar = input("¿Desea reservar esta cita? (s/n): ")
-            if confirmar.lower() == 's':
-                super().handle(request)
+            # Si hay horarios disponibles, continuar con la siguiente acción
+            if any(horarios.values() for horarios in medico_seleccionado.horario.values()):
+                hora_deseada_str = input("Ingrese la hora deseada (ejemplo: 10:00): ")
+                try:
+                    hora_deseada = datetime.strptime(hora_deseada_str, '%H:%M').time()
+                    hora_deseada_str = str(hora_deseada)
+                    if hora_deseada_str in map(str, medico_seleccionado.horario[dia]):
+                            if medico_seleccionado.horario[dia][hora_deseada]:
+                                # Si el usuario confirma la hora, continuar con la siguiente acción
+                                confirmar = input("¿Desea reservar esta cita? (s/n): ")
+                                if confirmar.lower() == 's':
+                                    fecha_hora = datetime.combine(fecha_deseada, hora_deseada)
+                                    request.fecha_hora = fecha_hora
+                                    super().handle(request)
+                                else:
+                                    print("Cita cancelada.")
+                            else:
+                                print("Hora inválida. Por favor, seleccione una hora disponible.")
+                except ValueError:
+                    print("Hora inválida. Por favor, ingrese una hora en formato HH:MM.")
+                    return
             else:
-                print("Cita cancelada.")
+                print("No hay horarios disponibles para esa fecha.")
         else:
             print("No se encontraron médicos disponibles para esa especialidad.")
 
-class ConfirmarCitaHandler(Handler, Medicos):
-    def handle(self, request):
-        # Obtener la especialidad del médico de la solicitud
-        especialidad = request.medico.especialidad
-        print(especialidad)
-        # Buscar médicos con la especialidad indicada
-        medicos_con_especialidad = Medicos.buscar_medico_especialidad(especialidad)
 
-        if medicos_con_especialidad:
-            # Seleccionar el primer médico encontrado
-            medico_seleccionado = medicos_con_especialidad[0]
-
-            # Mostrar los horarios disponibles del médico seleccionado
-            self._mostrar_horarios_disponibles(medico_seleccionado)
-
-            # Obtener el horario seleccionado por el usuario
-            horario_seleccionado = input("Ingrese el horario deseado (ejemplo: Día 1, Hora 10): ")
-
-            # Validar el horario seleccionado
-            if self._validar_horario(medico_seleccionado, horario_seleccionado):
-                # Crear la instancia de la cita
-                nueva_cita = Cita(request.paciente, medico_seleccionado, horario_seleccionado)
-
-                # Agregar la cita a las citas confirmadas del médico y a la lista general de citas
-                medico_seleccionado.citas_confirmadas.append(nueva_cita)
-                citas = Citas()
-                citas.agregar_cita(nueva_cita)
-
-                print("Cita confirmada exitosamente.")
-                # Agregar la cita a las citas confirmadas del médico y a la lista general de citas
-                medico_seleccionado.citas_confirmadas.append(nueva_cita)
-                citas.agregar_cita(nueva_cita)
-
-                # Crear una cadena de responsabilidad para notificaciones
-                notificacion_whatsapp = NotificacionWhatsapp()
-                notificacion_correo = NotificacionCorreo(notificacion_whatsapp)
-                notificacion_sms = NotificacionSMS(notificacion_correo)
-            else:
-                print("El horario seleccionado no está disponible.")
-        else:
-            print("No se encontraron médicos disponibles para esa especialidad.")
 
     def _mostrar_horarios_disponibles(self, medico):
         print("Horarios disponibles para", medico.nombre)
@@ -108,5 +105,8 @@ class ConfirmarCitaHandler(Handler, Medicos):
 class NotifyPatientHandler(Handler):
     def handle(self, request):
         # Notificar al paciente
-        print(f"Cita confirmada con {request.medico.nombre} el {request.fecha_hora}")
-        super().handle(request)
+        notificar = Notificar()
+        mensaje = "Recuerde que tiene una cita medica en 2 dias"
+        notificar.enviar_notificacion(request.paciente, mensaje=mensaje)
+        print(f"Enviando mensaje a {request.paciente.nombre}")
+        print(f"Persona notificada para la cita con {request.medico.nombre} el {request.fecha_hora}")

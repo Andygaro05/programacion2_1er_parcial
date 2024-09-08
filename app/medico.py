@@ -1,10 +1,11 @@
 from cita import *
+from datetime import time
 class Medico:
     def __init__(self, nombre, especialidad):
         self.nombre = nombre
         self.especialidad = especialidad
         self.horario = {dia: 
-                        {hora: True for hora in range(7, 21)} 
+                        {time(hora): True for hora in range(7, 21)} 
                         for dia in range(1, 8)
                         }  # Horario estándar de 7am a 9pm
         self.citas_confirmadas = []
